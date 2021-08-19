@@ -1,0 +1,67 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+
+<<>>=
+library(dplyr)
+library(tidyverse)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+%%%%%%%%%%statements%%%%%%%%%%
+<<>>=
+NegState <- read.table("statement_neg.csv", header = T, sep = "\t", stringsAsFactors = FALSE)
+
+NegState$L1[NegState$L1 == "dan"] <- "Danish"
+NegState$L1[NegState$L1 == "eng"] <- "English"
+NegState$L1[NegState$L1 == "fra"] <- "French"
+NegState$L1[NegState$L1 == "rus"] <- "Russian"
+NegState$L1[NegState$L1 == "tur"] <- "Turkish"
+NegState$L1[NegState$L1 == "uzb"] <- "Uzbek"
+NegState$L1[NegState$L1 == "deu"] <- "German"
+
+NegState <- NegState[order(NegState$L1, decreasing = F),]
+write.table(NegState,"statement_neg_final.txt",sep="\t",row.names=FALSE)
+
+#####read sorted modality
+NegStateSort <- read.table("statement_neg_sorted.csv", header = T, sep = ",", stringsAsFactors = FALSE)
+
+NegStateSort <- NegStateSort[ -c(1) ]
+NegStateSort <- NegStateSort[ -c(1) ]
+
+
+NegStateSort <- NegStateSort %>% mutate(NegStateSort = case_when(
+                                          NegStateSort$L1 == "Danish" ~ "61", 
+                                          NegStateSort$L1 == "English" ~ "80", 
+                                          NegStateSort$L1 == "French" ~ "34", 
+                                          NegStateSort$L1 == "Russian" ~ "26",
+                                          NegStateSort$L1 == "Turkish" ~ "11",
+                                          NegStateSort$L1 == "Uzbek" ~ "11",
+                                          NegStateSort$L1 == "German" ~ "187"))
+
+colnames(NegStateSort) <- c("Modality", "L1", "Count", "Processes")
+NegStateSort <- as.data.frame(NegStateSort)
+
+NegStateSort <- NegStateSort %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+NegStateSort <- NegStateSort %>%  mutate(Percent = Count / Processes * 100)
+NegStateSort <- NegStateSort %>% mutate_if(is.numeric, round, 3)
+
+write.table(NegStateSort,"statement_neg_sorted_results.csv",sep="\t",row.names=FALSE)
+@
+
+
+
+

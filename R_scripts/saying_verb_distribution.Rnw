@@ -1,0 +1,74 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+<<>>=
+SayingVerb <- read.table("saying_verb_distribution.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+SayingVerb <- SayingVerb[ -c(1) ]
+
+colnames(SayingVerb) <- c("Process", "Saying", "L1", "Count")
+
+SayingVerb$L1[SayingVerb$L1 == "dan"] <- "Danish"
+SayingVerb$L1[SayingVerb$L1 == "eng"] <- "English"
+SayingVerb$L1[SayingVerb$L1 == "fra"] <- "French"
+SayingVerb$L1[SayingVerb$L1 == "rus"] <- "Russian"
+SayingVerb$L1[SayingVerb$L1 == "tur"] <- "Turkish"
+SayingVerb$L1[SayingVerb$L1 == "uzb"] <- "Uzbek"
+SayingVerb$L1[SayingVerb$L1 == "deu"] <- "German"
+
+#translate verbs
+
+SayingVerb$Process[SayingVerb$Process == "anbieten"] <- "anbieten (offer)"
+SayingVerb$Process[SayingVerb$Process == "beantworten"] <- "beantworten (answer)"
+SayingVerb$Process[SayingVerb$Process == "behaupten"] <- "behaupten (assert)"
+SayingVerb$Process[SayingVerb$Process == "beschreiben"] <- "beschreiben (describe)"
+SayingVerb$Process[SayingVerb$Process == "bestimmen"] <- "bestimmen (determine)"
+SayingVerb$Process[SayingVerb$Process == "diskutieren"] <- "diskutieren (discuss)"
+SayingVerb$Process[SayingVerb$Process == "eingehen"] <- "eingehen (touch upon)"
+SayingVerb$Process[SayingVerb$Process == "einsetzen"] <- "einsetzen (advocate)"
+SayingVerb$Process[SayingVerb$Process == "erklären"] <- "erklären (explain)"
+SayingVerb$Process[SayingVerb$Process == "erwähnen"] <- "erwähnen (mention)"
+SayingVerb$Process[SayingVerb$Process == "fordern"] <- "fordern (demand)"
+SayingVerb$Process[SayingVerb$Process == "fragen"] <- "fragen (ask)"
+SayingVerb$Process[SayingVerb$Process == "nennen"] <- "nennen (name)"
+SayingVerb$Process[SayingVerb$Process == "sagen"] <- "sagen (say)"
+SayingVerb$Process[SayingVerb$Process == "schreiben"] <- "schreiben (write)"
+SayingVerb$Process[SayingVerb$Process == "sprechen"] <- "sprechen (speak)"
+SayingVerb$Process[SayingVerb$Process == "unterscheiden"] <- "unterscheiden (distinguish)"
+SayingVerb$Process[SayingVerb$Process == "verbieten"] <- "verbieten (forbid)"
+SayingVerb$Process[SayingVerb$Process == "vermitteln"] <- "vermitteln (convey)"
+SayingVerb$Process[SayingVerb$Process == "wünschen"] <- "wünschen (wish)"
+
+
+
+
+
+
+
+SayingVerb <- as.data.frame(SayingVerb)
+
+
+write.table(SayingVerb,"saying_verb_distribution_results.txt",sep="\t",row.names=FALSE)
+
+
+write.table(SayingVerb,"saying_verb_distribution_results.csv",sep="\t",row.names=FALSE)
+
+@

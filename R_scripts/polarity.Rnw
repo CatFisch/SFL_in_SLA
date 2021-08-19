@@ -1,0 +1,60 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+<<>>=
+PolarityTypes <- read.table("polarity.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+colnames(PolarityTypes) <- c("Polarity", "L1", "Count")
+
+PolarityTypes$L1[PolarityTypes$L1 == "dan"] <- "Danish"
+PolarityTypes$L1[PolarityTypes$L1 == "eng"] <- "English"
+PolarityTypes$L1[PolarityTypes$L1 == "fra"] <- "French"
+PolarityTypes$L1[PolarityTypes$L1 == "rus"] <- "Russian"
+PolarityTypes$L1[PolarityTypes$L1 == "tur"] <- "Turkish"
+PolarityTypes$L1[PolarityTypes$L1 == "uzb"] <- "Uzbek"
+PolarityTypes$L1[PolarityTypes$L1 == "deu"] <- "German"
+
+PolarityTypes <- PolarityTypes[order(PolarityTypes$L1, decreasing = F),]
+
+PolarityTypes <- PolarityTypes %>% mutate(PolarityTypes = case_when(
+                                          PolarityTypes$L1 == "Danish" ~ "61", 
+                                          PolarityTypes$L1 == "English" ~ "80", 
+                                          PolarityTypes$L1 == "French" ~ "34", 
+                                          PolarityTypes$L1 == "Russian" ~ "26",
+                                          PolarityTypes$L1 == "Turkish" ~ "11",
+                                          PolarityTypes$L1 == "Uzbek" ~ "11",
+                                          PolarityTypes$L1 == "German" ~ "187"))
+
+colnames(PolarityTypes) <- c("Polarity", "L1", "Count", "Processes")
+PolarityTypes <- as.data.frame(PolarityTypes)
+
+PolarityTypes <- PolarityTypes %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+PolarityTypes <- PolarityTypes %>%  mutate(Percent = Count / Processes * 100)
+PolarityTypes <- PolarityTypes %>% mutate_if(is.numeric, round, 3)
+
+write.table(PolarityTypes,"polarity_results.txt",sep="\t",row.names=FALSE)
+
+PolarityDel <- PolarityTypes[ -c(3) ]
+PolarityDel <- PolarityDel[ -c(3) ]
+
+write.table(PolarityDel,"polarity_results.csv",sep="\t",row.names=FALSE)
+
+@

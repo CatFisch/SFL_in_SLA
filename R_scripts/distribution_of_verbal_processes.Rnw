@@ -1,0 +1,70 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+
+<<>>=
+#processes in all documents over all languages
+Processes <- read.table("H1_overview.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+Processes <- Processes[ -c(1) ]
+colnames(Processes) <- c("L1","Processes")
+
+
+Processes$L1[Processes$L1 == "dan"] <- "Danish"
+Processes$L1[Processes$L1 == "eng"] <- "English"
+Processes$L1[Processes$L1 == "fra"] <- "French"
+Processes$L1[Processes$L1 == "rus"] <- "Russian"
+Processes$L1[Processes$L1 == "tur"] <- "Turkish"
+Processes$L1[Processes$L1 == "uzb"] <- "Uzbek"
+Processes$L1[Processes$L1 == "deu"] <- "German"
+
+Processes <- Processes[order(Processes$Processes, decreasing = TRUE),]
+
+write.table(Processes,"all_processes.csv",sep="\t",row.names=FALSE)
+
+#add columns for tokens
+Tokens <- read.table("ConsideredDocs.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+Tokens <- Tokens[ -c(1) ]
+colnames(Tokens) <- c("L1","Tokens")
+
+Tokens$L1[Tokens$L1 == "dan"] <- "Danish"
+Tokens$L1[Tokens$L1 == "eng"] <- "English"
+Tokens$L1[Tokens$L1 == "fra"] <- "French"
+Tokens$L1[Tokens$L1 == "rus"] <- "Russian"
+Tokens$L1[Tokens$L1 == "tur"] <- "Turkish"
+Tokens$L1[Tokens$L1 == "uzb"] <- "Uzbek"
+Tokens$L1[Tokens$L1 == "deu"] <- "German"
+
+Percentage <- merge(Tokens,Processes, by = "L1")
+Percentage <- as.data.frame(Percentage)
+Percentage <- Percentage %>%  mutate(Tokens = as.numeric(Tokens), Processes=as.numeric(Processes))
+
+Percentage <- Percentage %>%  mutate(Percent = Processes / Tokens * 100)
+Percentage <- Percentage %>% mutate_if(is.numeric, round, 3)
+CommaPercentage <- formatC(Percentage$Tokens, format="d", big.mark=",")
+Percentage$Tokens <- CommaPercentage
+
+Percentage <- Percentage[order(Percentage$Percent, decreasing = T),]
+
+
+write.table(Percentage,"processes_relation.csv",sep="\t",row.names=FALSE)
+write.table(Percentage,"processes_relation.txt",sep="\t",row.names=FALSE)
+@

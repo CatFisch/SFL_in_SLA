@@ -1,0 +1,91 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+
+<<>>=
+#processes in all documents over all languages
+Verbs <- read.table("verbal_original.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+Verbs <- Verbs[ -c(1) ]
+
+colnames(Verbs) <- c("Process", "L1", "Count")
+
+Verbs$L1[Verbs$L1 == "dan"] <- "Danish"
+Verbs$L1[Verbs$L1 == "eng"] <- "English"
+Verbs$L1[Verbs$L1 == "fra"] <- "French"
+Verbs$L1[Verbs$L1 == "rus"] <- "Russian"
+Verbs$L1[Verbs$L1 == "tur"] <- "Turkish"
+Verbs$L1[Verbs$L1 == "uzb"] <- "Uzbek"
+Verbs$L1[Verbs$L1 == "deu"] <- "German"
+
+Verbs <- Verbs[order(Verbs$L1, decreasing = F),]
+
+#add prcentage of processes
+
+Numbers <- read.table("processes_relation.csv", header = T, sep = "\t", stringsAsFactors = FALSE)
+
+All <- Verbs %>% mutate(Verbs = case_when(Verbs$L1 == "Danish" ~ "61", 
+                                          Verbs$L1 == "English" ~ "80", 
+                                          Verbs$L1 == "French" ~ "34", 
+                                          Verbs$L1 == "Russian" ~ "26",
+                                          Verbs$L1 == "Turkish" ~ "11",
+                                          Verbs$L1 == "Uzbek" ~ "11",
+                                          Verbs$L1 == "German" ~ "187"))
+
+
+All <- as.data.frame(All)
+All <- All %>%  mutate(Count = as.numeric(Count), Verbs=as.numeric(Verbs))
+All <- All %>%  mutate(Percent = Count / Verbs * 100)
+All <- All %>% mutate_if(is.numeric, round, 3)
+
+colnames(All) <- c("Process", "L1", "CountOne", "CountAll", "Share" )
+
+write.table(All,"all_verbs.csv",sep="\t",row.names=FALSE)
+
+#translate verbs
+
+All$Process[All$Process == "anbieten"] <- "anbieten (offer)"
+All$Process[All$Process == "beantworten"] <- "beantworten (answer)"
+All$Process[All$Process == "behaupten"] <- "behaupten (assert)"
+All$Process[All$Process == "beschreiben"] <- "beschreiben (describe)"
+All$Process[All$Process == "bestimmen"] <- "bestimmen (determine)"
+All$Process[All$Process == "diskutieren"] <- "diskutieren (discuss)"
+All$Process[All$Process == "eingehen"] <- "eingehen (touch upon)"
+All$Process[All$Process == "einsetzen"] <- "einsetzen (advocate)"
+All$Process[All$Process == "erklären"] <- "erklären (explain)"
+All$Process[All$Process == "erwähnen"] <- "erwähnen (mention)"
+All$Process[All$Process == "fordern"] <- "fordern (demand)"
+All$Process[All$Process == "fragen"] <- "fragen (ask)"
+All$Process[All$Process == "nennen"] <- "nennen (name)"
+All$Process[All$Process == "sagen"] <- "sagen (say)"
+All$Process[All$Process == "schreiben"] <- "schreiben (write)"
+All$Process[All$Process == "sprechen"] <- "sprechen (speak)"
+All$Process[All$Process == "unterscheiden"] <- "unterscheiden (distinguish)"
+All$Process[All$Process == "verbieten"] <- "verbieten (forbid)"
+All$Process[All$Process == "vermitteln"] <- "vermitteln (convey)"
+All$Process[All$Process == "wünschen"] <- "wünschen (wish)"
+
+write.table(All,"all_verbs.txt",sep="\t",row.names=FALSE)
+
+
+@

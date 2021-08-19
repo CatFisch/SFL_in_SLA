@@ -1,0 +1,100 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+library(tidyverse)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+%%%%%%%%%%statements%%%%%%%%%%
+<<>>=
+StModTypes <- read.table("mod_statement.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+colnames(StModTypes) <- c("Function","Polarity", "Modality", "L1", "Count")
+
+StModTypes$L1[StModTypes$L1 == "dan"] <- "Danish"
+StModTypes$L1[StModTypes$L1 == "eng"] <- "English"
+StModTypes$L1[StModTypes$L1 == "fra"] <- "French"
+StModTypes$L1[StModTypes$L1 == "rus"] <- "Russian"
+StModTypes$L1[StModTypes$L1 == "tur"] <- "Turkish"
+StModTypes$L1[StModTypes$L1 == "uzb"] <- "Uzbek"
+StModTypes$L1[StModTypes$L1 == "deu"] <- "German"
+
+StModTypes <- StModTypes[order(StModTypes$L1, decreasing = F),]
+
+StModTypes <- StModTypes %>% mutate(StModTypes = case_when(
+                                          StModTypes$L1 == "Danish" ~ "61", 
+                                          StModTypes$L1 == "English" ~ "80", 
+                                          StModTypes$L1 == "French" ~ "34", 
+                                          StModTypes$L1 == "Russian" ~ "26",
+                                          StModTypes$L1 == "Turkish" ~ "11",
+                                          StModTypes$L1 == "Uzbek" ~ "11",
+                                          StModTypes$L1 == "German" ~ "187"))
+
+colnames(StModTypes) <- c("Function","Polarity", "Modality", "L1", "Count", "Processes")
+StModTypes <- as.data.frame(StModTypes)
+
+StModTypes <- StModTypes %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+StModTypes <- StModTypes %>%  mutate(Percent = Count / Processes * 100)
+StModTypes <- StModTypes %>% mutate_if(is.numeric, round, 3)
+
+CommaPercentage <- formatC(StModTypes$Processes, format="d", big.mark=",")
+StModTypes$Processes <- CommaPercentage
+StModTypes <- StModTypes[ -c(1) ]
+StModTypes <- StModTypes[ -c(1) ]
+write.table(StModTypes,"mod_statements_results.csv",sep="\t",row.names=FALSE)
+
+######merge plus and minus
+StModSum <- read.table("mod_stat_summary.csv", header = T, sep = ",", stringsAsFactors = FALSE)
+
+StModSum <- StModSum[order(StModSum$L1, decreasing = F),]
+StModSum <- as.data.frame(StModSum)
+
+StModSum <- StModSum %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+StModSum <- StModSum %>%  mutate(Percent = Count / Processes * 100)
+StModSum <- StModSum %>% mutate_if(is.numeric, round, 3)
+
+write.table(StModSum,"mod_stat_summary_results.txt",sep="\t",row.names=FALSE)
+
+
+StModSumDel <- StModSum[ -c(3) ]
+StModSumDel <- StModSumDel[ -c(3) ]
+
+write.table(StModSumDel,"mod_statements_results.csv",sep="\t",row.names=FALSE)
+
+######validity only
+StatVal <- read.table("mod_statements_val.csv", header = T, sep = ",", stringsAsFactors = FALSE)
+
+StatVal <- as.data.frame(StatVal)
+
+StatVal <- StatVal %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+StatVal <- StatVal %>%  mutate(Percent = Count / Processes * 100)
+StatVal <- StatVal %>% mutate_if(is.numeric, round, 3)
+
+write.table(StatVal,"mod_statements_val_results.txt",sep="\t",row.names=FALSE)
+
+
+StatValDel <- StatVal[ -c(3) ]
+StatValDel <- StatValDel[ -c(3) ]
+
+write.table(StatValDel,"mod_statements_val_results.csv",sep="\t",row.names=FALSE)
+
+@
+
+
+
+

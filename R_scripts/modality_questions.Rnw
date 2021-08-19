@@ -1,0 +1,70 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+library(tidyverse)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+%%%%%%%%%%statements%%%%%%%%%%
+<<>>=
+QModTypes <- read.table("mod_question.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+colnames(QModTypes) <- c("Function","Polarity", "Modality", "L1", "Count")
+
+QModTypes$L1[QModTypes$L1 == "dan"] <- "Danish"
+QModTypes$L1[QModTypes$L1 == "eng"] <- "English"
+QModTypes$L1[QModTypes$L1 == "fra"] <- "French"
+QModTypes$L1[QModTypes$L1 == "rus"] <- "Russian"
+QModTypes$L1[QModTypes$L1 == "tur"] <- "Turkish"
+QModTypes$L1[QModTypes$L1 == "uzb"] <- "Uzbek"
+QModTypes$L1[QModTypes$L1 == "deu"] <- "German"
+
+QModTypes <- QModTypes[order(QModTypes$L1, decreasing = F),]
+
+QModTypes <- QModTypes %>% mutate(QModTypes = case_when(
+                                          QModTypes$L1 == "Danish" ~ "61", 
+                                          QModTypes$L1 == "English" ~ "80", 
+                                          QModTypes$L1 == "French" ~ "34", 
+                                          QModTypes$L1 == "Russian" ~ "26",
+                                          QModTypes$L1 == "Turkish" ~ "11",
+                                          QModTypes$L1 == "Uzbek" ~ "11",
+                                          QModTypes$L1 == "German" ~ "187"))
+
+colnames(QModTypes) <- c("Function","Polarity", "Modality", "L1", "Count", "Processes")
+QModTypes <- as.data.frame(QModTypes)
+
+QModTypes <- QModTypes %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+QModTypes <- QModTypes %>%  mutate(Percent = Count / Processes * 100)
+QModTypes <- QModTypes %>% mutate_if(is.numeric, round, 3)
+
+QModTypes <- QModTypes[ -c(1) ]
+QModTypes <- QModTypes[ -c(1) ]
+
+write.table(QModTypes,"mod_question_results.txt",sep="\t",row.names=FALSE)
+
+QModTypes <- QModTypes[ -c(3) ]
+QModTypes <- QModTypes[ -c(3) ]
+
+write.table(QModTypes,"mod_question_results.csv",sep="\t",row.names=FALSE)
+
+
+@
+
+
+
+

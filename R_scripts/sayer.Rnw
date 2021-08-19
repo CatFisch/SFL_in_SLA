@@ -1,0 +1,61 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+
+<<>>=
+SayerType <- read.table("sayer.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+
+colnames(SayerType) <- c("Sayer", "L1", "Count")
+
+SayerType$L1[SayerType$L1 == "dan"] <- "Danish"
+SayerType$L1[SayerType$L1 == "eng"] <- "English"
+SayerType$L1[SayerType$L1 == "fra"] <- "French"
+SayerType$L1[SayerType$L1 == "rus"] <- "Russian"
+SayerType$L1[SayerType$L1 == "tur"] <- "Turkish"
+SayerType$L1[SayerType$L1 == "uzb"] <- "Uzbek"
+SayerType$L1[SayerType$L1 == "deu"] <- "German"
+
+SayerType <- SayerType[order(SayerType$L1, decreasing = F),]
+
+SayerType <- SayerType %>% mutate(SayerType = case_when(
+                                          SayerType$L1 == "Danish" ~ "61", 
+                                          SayerType$L1 == "English" ~ "80", 
+                                          SayerType$L1 == "French" ~ "34", 
+                                          SayerType$L1 == "Russian" ~ "26",
+                                          SayerType$L1 == "Turkish" ~ "11",
+                                          SayerType$L1 == "Uzbek" ~ "11",
+                                          SayerType$L1 == "German" ~ "187"))
+
+colnames(SayerType) <- colnames(SayerType) <- c("Sayer", "L1", "Count", "Processes")
+
+SayerType <- as.data.frame(SayerType)
+SayerType <- SayerType %>%  mutate(Count = as.numeric(Count), Processes=as.numeric(Processes))
+SayerType <- SayerType %>%  mutate(Percent = Count / Processes * 100)
+SayerType <- SayerType %>% mutate_if(is.numeric, round, 3)
+
+
+write.table(SayerType,"sayer_results.txt",sep="\t",row.names=FALSE)
+
+SayerDel <- SayerType[ -c(3) ]
+SayerDel <- SayerDel[ -c(3) ]
+write.table(SayerDel,"sayer_results.csv",sep="\t",row.names=FALSE)
+@

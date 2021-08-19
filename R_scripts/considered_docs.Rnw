@@ -1,0 +1,56 @@
+%Copyright 2021 Catharina Fischer
+
+%Licensed under the Apache License, Version 2.0 (the "License");
+%you may not use this file except in compliance with the License.
+%You may obtain a copy of the License at
+
+    %http://www.apache.org/licenses/LICENSE-2.0
+
+%Unless required by applicable law or agreed to in writing, software
+%distributed under the License is distributed on an "AS IS" BASIS,
+%WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%See the License for the specific language governing permissions and
+%limitations under the License.
+
+
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%processes in all documents over all languages%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<>>=
+Considered <- read.table("ConsideredDocs.csv", header = F, sep = "\t", stringsAsFactors = FALSE)
+Considered <- Considered[ -c(1) ]
+colnames(Considered) <- c("L1","Count")
+
+Considered$L1[Considered$L1 == "dan"] <- "Danish"
+Considered$L1[Considered$L1 == "eng"] <- "English"
+Considered$L1[Considered$L1 == "fra"] <- "French"
+Considered$L1[Considered$L1 == "rus"] <- "Russian"
+Considered$L1[Considered$L1 == "tur"] <- "Turkish"
+Considered$L1[Considered$L1 == "uzb"] <- "Uzbek"
+Considered$L1[Considered$L1 == "deu"] <- "German"
+
+
+Considered <- Considered %>% mutate(Documents = case_when(Considered$L1 == "Danish" ~ "38", 
+                                          Considered$L1 == "English" ~ "48", 
+                                          Considered$L1 == "French" ~ "17", 
+                                          Considered$L1 == "Russian" ~ "12",
+                                          Considered$L1 == "Turkish" ~ "10",
+                                          Considered$L1 == "Uzbek" ~ "11",
+                                          Considered$L1 == "German" ~ "95"))
+
+Considered <- as.data.frame(Considered)
+Considered <- Considered %>%  mutate(Documents = as.numeric(Documents))
+
+Considered <- Considered[order(Considered$Count, decreasing = TRUE),]
+Considered <- Considered %>% add_row(L1= "SUM", Count= sum(Considered$Count), Documents = sum(Considered$Documents))
+
+CommaPercentage <- formatC(Considered$Count, format="d", big.mark=",")
+Considered$Count <- CommaPercentage
+
+write.table(Considered,"ConsideredDocsResult.csv",sep="\t",row.names=FALSE)
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
