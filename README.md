@@ -18,7 +18,7 @@ limitations under the License.
 
 
 ## Annotated_excel-files
-Excel files that contain argumentative essays that were automatically and manually annotated in the scope of my master theses. The original files can be accessed here: https://www.linguistik.hu-berlin.de/en/institut-en/professuren-en/korpuslinguistik/research/falko/access (see also Reznicek, Marc, Anke Lüdeling, Cedric Krummes, Franziska Schwantuschke, Maik Walter, Karin Schmidt, Hagen Hirschmann, and Torsten Andreas (2012). Das Falko-Handbuch. Korpusaufbau und Annotationen. Version 2.01)
+Excel files that contain argumentative essays that were automatically and manually annotated in the scope of my master theses. The original files can be accessed here: https://www.linguistik.hu-berlin.de/en/institut-en/professuren-en/korpuslinguistik/research/falko/access (see also Reznicek, Marc, Anke Lüdeling, Cedric Krummes, Franziska Schwantuschke, Maik Walter, Karin Schmidt, Hagen Hirschmann and Torsten Andreas (2012). Das Falko-Handbuch. Korpusaufbau und Annotationen. Version 2.01)
 
 ## Converted_ANNIS_files
 Contains the above mentioned excel files converted into a format readable for the search- and visualization tool ANNIS accessible here: https://korpling.german.hu-berlin.de/falko-suche/
