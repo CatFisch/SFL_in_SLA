@@ -1,0 +1,39 @@
+<<>>=
+library(dplyr)
+current_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(current_dir)
+@
+
+<<>>=
+process_questions <- read.table("process_questions.csv", header = T, sep = ",", stringsAsFactors = FALSE)
+
+colnames(process_questions) <- c("Topic", "L1", "Processes", "Tokens")
+
+process_questions$L1[process_questions$L1 == "dan"] <- "Danish"
+process_questions$L1[process_questions$L1 == "eng"] <- "English"
+process_questions$L1[process_questions$L1 == "fra"] <- "French"
+process_questions$L1[process_questions$L1 == "rus"] <- "Russian"
+process_questions$L1[process_questions$L1 == "tur"] <- "Turkish"
+process_questions$L1[process_questions$L1 == "uzb"] <- "Uzbek"
+process_questions$L1[process_questions$L1 == "deu"] <- "German"
+
+process_questions$Topic[process_questions$Topic == "Kriminalität"] <- "Crime"
+process_questions$Topic[process_questions$Topic == "Entlohnung"] <- "Payment"
+process_questions$Topic[process_questions$Topic == "Studium"] <- "Study"
+process_questions$Topic[process_questions$Topic == "Feminismus"] <- "Feminism"
+
+
+process_questions <- process_questions[order(process_questions$L1, decreasing = F),]
+
+process_questions <- as.data.frame(process_questions)
+
+process_questions <- process_questions %>%  mutate(Tokens = as.numeric(Tokens), Processes=as.numeric(Processes))
+process_questions <- process_questions %>%  mutate(Percent = Processes / Tokens * 100)
+process_questions <- process_questions %>% mutate_if(is.numeric, round, 3)
+
+write.table(process_questions,"process_questions.txt",sep="\t",row.names=FALSE)
+
+
+write.table(process_questions,"process_questions_results.csv",sep="\t",row.names=FALSE)
+
+@
